@@ -1,4 +1,4 @@
-temporarySimpactCyanInstallFunctionName <- function() {
+local({
 
     packagesUrl <- "https://raw.githubusercontent.com/j0r1/RSimpactCyanBootstrap/master/packages.csv"
     ownRepos <- "http://research.edm.uhasselt.be/jori"
@@ -50,7 +50,5 @@ temporarySimpactCyanInstallFunctionName <- function() {
     }
 
     installPackages(packageInfo)
-}
+})
 
-temporarySimpactCyanInstallFunctionName()
-temporarySimpactCyanInstallFunctionName <- NULL
