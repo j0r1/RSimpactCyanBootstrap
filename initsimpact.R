@@ -33,6 +33,7 @@ local({
                     message("Version for ", name, " is ", vPack, ", needed version is ", vNeeded)
                     if (utils::compareVersion(vPack, vNeeded) < 0) {
                         message("Package ", name, " is outdated, updating")
+			unloadNamespace(name) # unload it first, otherwist R may want to be restarted
                         install.packages(name)
                     }
                 }, error = function(e) { # We're assuming that it can't be loaded because it doesn't exist
