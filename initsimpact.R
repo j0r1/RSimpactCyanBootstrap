@@ -33,7 +33,7 @@ local({
                     message("Version for ", name, " is ", vPack, ", needed version is ", vNeeded)
                     if (utils::compareVersion(vPack, vNeeded) < 0) {
                         message("Package ", name, " is outdated, updating")
-			unloadNamespace(name) # unload it first, otherwist R may want to be restarted
+                        unloadNamespace(name) # unload it first, otherwist R may want to be restarted
                         install.packages(name)
                     }
                 }, error = function(e) { # We're assuming that it can't be loaded because it doesn't exist
@@ -45,12 +45,10 @@ local({
             }
         }
     
-        packageInfo <- list()
-        packageInfo[["RCurl"]] <- "0.0.0"
-        installPackages(packageInfo)
-        
-        library(RCurl)
-        csvInfo <- read.csv(text = getURL(packagesUrl))
+        conn <- url(packagesUrl)
+        csvInfo <- read.csv(text = readLines(conn))
+        close(conn)
+
         packageInfo <- list()
     
         for (i in 1:nrow(csvInfo)) {
@@ -62,7 +60,7 @@ local({
         installPackages(packageInfo)
     }, finally =  {
         # Restore the original repository settings
-	options(repos = origRepos)
+        options(repos = origRepos)
     })
 })
 
