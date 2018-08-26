@@ -1,5 +1,5 @@
-"Name","Version"
-RJSONIO,1.3.0
-findpython,1.0.1
-rPithon,1.1.2
-RSimpactCyan,1.5.0
+"Name","Version","GitHub"
+RJSONIO,1.3.0,no
+findpython,1.0.3,no
+rPithon,1.1.2,j0r1/rPithon/pkg@v1.1.2
+RSimpactCyan,1.5.0,j0r1/RSimpactCyan/pkg@v1.5.0
