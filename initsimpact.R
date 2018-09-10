@@ -1,14 +1,12 @@
 local({
 
     origRepos <- getOption("repos")
-    ownRepos <- "http://research.edm.uhasselt.be/jori"
     defaultRepos <- "https://cran.ma.imperial.ac.uk/"
     packagesUrl <- "https://raw.githubusercontent.com/j0r1/RSimpactCyanBootstrap/master/packages.csv"
     
     tryCatch({
 
-        # Add own repository to the list, and if no default CRAN
-        # repo has been provided, use a specific mirror
+        # If no default CRAN repo has been provided, use a specific mirror
         x <- getOption("repos")
         if (!is.element("CRAN", x)) { 
             x["CRAN"] = defaultRepos
@@ -18,8 +16,16 @@ local({
             }
         }
         
-        x["SimpactCyan"] <- "http://research.edm.uhasselt.be/jori"
         options(repos = x)
+
+        installPackageOrGitHub <- function(packageInfo, name) {
+            gn <- packageInfo[[name]]$github
+            if (gn == "no") {
+                install.packages(name)
+            } else {
+                devtools::install_github(gn)
+            }
+        }
 
         # Helper function to install specified packages
         installPackages <- function(packageInfo) {
@@ -28,18 +34,19 @@ local({
                 tryCatch({ 
                     library(name, character.only=TRUE)
                     vPack <- toString(packageVersion(name))
-                    vNeeded <- packageInfo[[name]]
+                    vNeeded <- packageInfo[[name]]$version
     
                     message("Version for ", name, " is ", vPack, ", needed version is ", vNeeded)
                     if (utils::compareVersion(vPack, vNeeded) < 0) {
                         message("Package ", name, " is outdated, updating")
                         unloadNamespace(name) # unload it first, otherwist R may want to be restarted
-                        install.packages(name)
+
+                        installPackageOrGitHub(packageInfo, name)
                     }
                 }, error = function(e) { # We're assuming that it can't be loaded because it doesn't exist
                     print(e)
                     message("Installing package ", name, " for the first time")
-                    install.packages(name)
+                    installPackageOrGitHub(packageInfo, name)
                 })
                 library(name, character.only=TRUE)
             }
@@ -51,10 +58,13 @@ local({
 
         packageInfo <- list()
     
+        packageInfo[["devtools"]] <- list(version="1.13.6", github="no")
         for (i in 1:nrow(csvInfo)) {
             n <- toString(csvInfo$Name[[i]])
             v <- toString(csvInfo$Version[[i]])
-            packageInfo[[n]] <- v
+            g <- toString(csvInfo$GitHub[[i]])
+
+            packageInfo[[n]] <- list(version=v, github=g)
         }
     
         installPackages(packageInfo)
